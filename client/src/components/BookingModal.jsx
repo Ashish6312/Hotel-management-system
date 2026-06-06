@@ -23,14 +23,15 @@ export default function BookingModal({
     last_name: '',
     email: '',
     phone: '',
-    document_id: ''
+    document_type: 'Aadhaar Card',
+    document_number: ''
   });
 
   // Booking details
   const [checkInDate, setCheckInDate] = useState(new Date().toISOString().split('T')[0]);
   const [checkOutDate, setCheckOutDate] = useState('');
   const [instantCheckIn, setInstantCheckIn] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState('Credit Card');
+  const [paymentMethod, setPaymentMethod] = useState('UPI');
   
   const [totalPrice, setTotalPrice] = useState(0);
   const [nightsCount, setNightsCount] = useState(0);
@@ -50,7 +51,7 @@ export default function BookingModal({
     }
   }, [preselectedRoomId, rooms]);
 
-  // Recalculate price
+  // Recalculate price (incorporating standard SGST and CGST based on Indian slabs)
   useEffect(() => {
     const room = rooms.find(r => r.id === parseInt(selectedRoomId));
     if (room && checkInDate && checkOutDate) {
@@ -61,7 +62,9 @@ export default function BookingModal({
       
       if (nights > 0) {
         setNightsCount(nights);
-        setTotalPrice(nights * room.price);
+        const base = nights * room.price;
+        const gstRate = room.price <= 7500 ? 0.12 : 0.18;
+        setTotalPrice(base + (base * gstRate));
       } else {
         setNightsCount(0);
         setTotalPrice(0);
@@ -76,15 +79,24 @@ export default function BookingModal({
     e.preventDefault();
     if (!selectedRoomId) return alert('Please select a room');
     if (useExistingGuest && !selectedGuestId) return alert('Please select a guest');
-    if (!useExistingGuest && (!newGuest.first_name || !newGuest.last_name || !newGuest.email || !newGuest.phone || !newGuest.document_id)) {
+    if (!useExistingGuest && (!newGuest.first_name || !newGuest.last_name || !newGuest.email || !newGuest.phone || !newGuest.document_number)) {
       return alert('Please fill in all guest details');
     }
     if (nightsCount <= 0) return alert('Check-out date must be after check-in date');
 
+    // Format guest data with combined Document Type + Number
+    const formattedGuestData = useExistingGuest ? null : {
+      first_name: newGuest.first_name,
+      last_name: newGuest.last_name,
+      email: newGuest.email,
+      phone: newGuest.phone,
+      document_id: `${newGuest.document_type || 'Aadhaar Card'}-${newGuest.document_number}`
+    };
+
     const bookingData = {
       room_id: parseInt(selectedRoomId),
       guest_id: useExistingGuest ? parseInt(selectedGuestId) : null,
-      guest_data: useExistingGuest ? null : newGuest,
+      guest_data: formattedGuestData,
       check_in_date: checkInDate,
       check_out_date: checkOutDate,
       status: instantCheckIn ? 'CheckedIn' : 'Booked',
@@ -183,20 +195,41 @@ export default function BookingModal({
                 </div>
               </div>
 
-              {/* Pricing breakdown */}
-              {selectedRoom && nightsCount > 0 && (
-                <div className="bg-bg-panel/30 border border-border-subtle/50 rounded-xl p-4 mt-2">
-                  <h5 className="text-xs font-bold text-slate-400 mb-2 uppercase">Price Details</h5>
-                  <div className="flex justify-between text-sm text-slate-300 mb-1.5">
-                    <span>₹{selectedRoom.price} × {nightsCount} nights</span>
-                    <span>₹{totalPrice.toFixed(2)}</span>
+              {/* Pricing breakdown with CGST and SGST */}
+              {selectedRoom && nightsCount > 0 && (() => {
+                const base = nightsCount * selectedRoom.price;
+                const gstRate = selectedRoom.price <= 7500 ? 12 : 18;
+                const cgst = base * (gstRate / 2) / 100;
+                const sgst = base * (gstRate / 2) / 100;
+                const totalGst = cgst + sgst;
+                const finalTotal = base + totalGst;
+
+                return (
+                  <div className="bg-bg-panel/30 border border-border-subtle/50 rounded-xl p-4 mt-2 space-y-2">
+                    <h5 className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">GST Invoice Breakdown</h5>
+                    <div className="flex justify-between text-xs text-slate-300">
+                      <span>Room Rent ({nightsCount} nights × ₹{selectedRoom.price})</span>
+                      <span>₹{base.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>CGST ({gstRate / 2}%)</span>
+                      <span>₹{cgst.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>SGST ({gstRate / 2}%)</span>
+                      <span>₹{sgst.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400 font-semibold border-t border-border-subtle/30 pt-1.5">
+                      <span>Total GST ({gstRate}%)</span>
+                      <span>₹{totalGst.toFixed(2)}</span>
+                    </div>
+                    <div className="border-t border-border-subtle/50 pt-2 flex justify-between text-base font-bold text-hotel-gold">
+                      <span>Total (Inclusive of GST)</span>
+                      <span>₹{finalTotal.toFixed(2)}</span>
+                    </div>
                   </div>
-                  <div className="border-t border-border-subtle/50 pt-2 mt-2 flex justify-between text-base font-bold text-hotel-gold">
-                    <span>Total Amount</span>
-                    <span>₹{totalPrice.toFixed(2)}</span>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
 
             {/* Right Column: Guest Information */}
@@ -309,16 +342,32 @@ export default function BookingModal({
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-400 mb-1 uppercase">Document ID (Passport/ID Card)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Passport, State ID"
-                      value={newGuest.document_id}
-                      onChange={(e) => setNewGuest({ ...newGuest, document_id: e.target.value })}
-                      className="w-full bg-bg-panel/70 border border-border-subtle rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent-indigo"
-                      required
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-1 uppercase">Document Type</label>
+                      <select
+                        value={newGuest.document_type || 'Aadhaar Card'}
+                        onChange={(e) => setNewGuest({ ...newGuest, document_type: e.target.value })}
+                        className="w-full bg-bg-panel/70 border border-border-subtle rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent-indigo"
+                      >
+                        <option>Aadhaar Card</option>
+                        <option>PAN Card</option>
+                        <option>Passport</option>
+                        <option>Driving License</option>
+                        <option>Voter ID</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-400 mb-1 uppercase">Document Number</label>
+                      <input
+                        type="text"
+                        placeholder="Enter ID number"
+                        value={newGuest.document_number || ''}
+                        onChange={(e) => setNewGuest({ ...newGuest, document_number: e.target.value })}
+                        className="w-full bg-bg-panel/70 border border-border-subtle rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent-indigo"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -342,7 +391,7 @@ export default function BookingModal({
                   <div className="pt-2 border-t border-border-subtle/40 animate-fade-in">
                     <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Payment Method</label>
                     <div className="grid grid-cols-2 gap-2">
-                      {['Credit Card', 'Cash', 'Bank Transfer', 'Digital Wallet'].map((method) => (
+                      {['UPI', 'Cash', 'Credit Card', 'Bank Transfer'].map((method) => (
                         <button
                           key={method}
                           type="button"

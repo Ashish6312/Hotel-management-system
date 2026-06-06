@@ -11,7 +11,8 @@ export default function GuestsView({ guests = [], onAddGuest }) {
     last_name: '',
     email: '',
     phone: '',
-    document_id: ''
+    document_type: 'Aadhaar Card',
+    document_number: ''
   });
   
   const [errorMsg, setErrorMsg] = useState('');
@@ -31,14 +32,22 @@ export default function GuestsView({ guests = [], onAddGuest }) {
     setErrorMsg('');
     setSuccessMsg('');
 
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.phone || !formData.document_id) {
+    if (!formData.first_name || !formData.last_name || !formData.email || !formData.phone || !formData.document_number) {
       return setErrorMsg('All fields are required.');
     }
 
+    const payload = {
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      email: formData.email,
+      phone: formData.phone,
+      document_id: `${formData.document_type || 'Aadhaar Card'}-${formData.document_number}`
+    };
+
     try {
-      await onAddGuest(formData);
+      await onAddGuest(payload);
       setSuccessMsg('Guest registered successfully!');
-      setFormData({ first_name: '', last_name: '', email: '', phone: '', document_id: '' });
+      setFormData({ first_name: '', last_name: '', email: '', phone: '', document_type: 'Aadhaar Card', document_number: '' });
       setTimeout(() => {
         setIsAdding(false);
         setSuccessMsg('');
@@ -140,15 +149,32 @@ export default function GuestsView({ guests = [], onAddGuest }) {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Document ID (Passport/SSN/Driver License)</label>
-              <input
-                type="text"
-                value={formData.document_id}
-                onChange={(e) => setFormData({ ...formData, document_id: e.target.value })}
-                className="w-full bg-bg-panel/75 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent-indigo"
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Document Type</label>
+                <select
+                  value={formData.document_type || 'Aadhaar Card'}
+                  onChange={(e) => setFormData({ ...formData, document_type: e.target.value })}
+                  className="w-full bg-bg-panel/75 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent-indigo"
+                >
+                  <option>Aadhaar Card</option>
+                  <option>PAN Card</option>
+                  <option>Passport</option>
+                  <option>Driving License</option>
+                  <option>Voter ID</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Document Number</label>
+                <input
+                  type="text"
+                  placeholder="Enter ID number"
+                  value={formData.document_number || ''}
+                  onChange={(e) => setFormData({ ...formData, document_number: e.target.value })}
+                  className="w-full bg-bg-panel/75 border border-border-subtle rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent-indigo"
+                  required
+                />
+              </div>
             </div>
 
             <button

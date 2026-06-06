@@ -54,7 +54,7 @@ CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
     booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
     amount DECIMAL(10, 2) NOT NULL,
-    payment_method VARCHAR(50) CHECK(payment_method IN ('Credit Card', 'Cash', 'Bank Transfer', 'Digital Wallet')) NOT NULL,
+    payment_method VARCHAR(50) CHECK(payment_method IN ('Credit Card', 'Cash', 'Bank Transfer', 'UPI')) NOT NULL,
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

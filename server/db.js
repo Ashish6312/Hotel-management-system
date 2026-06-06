@@ -164,7 +164,7 @@ async function seedData() {
       [roomId, guestId, formatDate(checkIn), formatDate(checkOut), 'CheckedOut', totalPrice]
     );
     
-    const payMethod = ['Credit Card', 'Cash', 'Digital Wallet', 'Bank Transfer'][i % 4];
+    const payMethod = ['UPI', 'Cash', 'Credit Card', 'Bank Transfer'][i % 4];
     await run(
       'INSERT INTO transactions (booking_id, amount, payment_method, payment_date) VALUES (?, ?, ?, ?)',
       [res.lastID, totalPrice, payMethod, formatDate(checkOut)]
@@ -196,7 +196,7 @@ async function seedData() {
     await run('UPDATE rooms SET status = \'Occupied\' WHERE id = ?', [b[0]]);
     
     // Create transaction (payment received at check-in)
-    const payMethod = ['Credit Card', 'Cash', 'Digital Wallet'][b[0] % 3];
+    const payMethod = ['UPI', 'Cash', 'Credit Card'][b[0] % 3];
     await run(
       'INSERT INTO transactions (booking_id, amount, payment_method, payment_date) VALUES (?, ?, ?, ?)',
       [res.lastID, totalPrice, payMethod, formatDate(checkIn)]

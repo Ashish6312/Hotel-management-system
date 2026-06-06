@@ -46,9 +46,9 @@ router.post('/auth/login', async (req, res) => {
 router.get('/dashboard/stats', async (req, res) => {
   try {
     const totalRoomsRow = await db.get('SELECT COUNT(*) as count FROM rooms');
-    const occupiedRoomsRow = await db.get('SELECT COUNT(*) as count FROM rooms WHERE status = "Occupied"');
-    const availableRoomsRow = await db.get('SELECT COUNT(*) as count FROM rooms WHERE status = "Available"');
-    const maintenanceRoomsRow = await db.get('SELECT COUNT(*) as count FROM rooms WHERE status = "Maintenance"');
+    const occupiedRoomsRow = await db.get("SELECT COUNT(*) as count FROM rooms WHERE status = 'Occupied'");
+    const availableRoomsRow = await db.get("SELECT COUNT(*) as count FROM rooms WHERE status = 'Available'");
+    const maintenanceRoomsRow = await db.get("SELECT COUNT(*) as count FROM rooms WHERE status = 'Maintenance'");
 
     // Revenue
     const today = new Date().toISOString().split('T')[0];
@@ -190,7 +190,7 @@ router.get('/bookings', async (req, res) => {
     const bookings = await db.query(`
       SELECT b.*, 
              r.room_number, r.type as room_type, r.price as room_price,
-             g.first_name, g.last_name, g.email as guest_email, g.phone as guest_phone
+             g.first_name, g.last_name, g.email as guest_email, g.phone as guest_phone, g.document_id
       FROM bookings b
       JOIN rooms r ON b.room_id = r.id
       JOIN guests g ON b.guest_id = g.id
@@ -245,7 +245,7 @@ router.post('/bookings', async (req, res) => {
 
     // If immediate check-in
     if (bookingStatus === 'CheckedIn') {
-      await db.run('UPDATE rooms SET status = "Occupied" WHERE id = ?', [room_id]);
+      await db.run("UPDATE rooms SET status = 'Occupied' WHERE id = ?", [room_id]);
       
       // Create transaction record
       const payMethod = payment_method || 'Credit Card';
@@ -286,8 +286,8 @@ router.post('/bookings/:id/check-in', async (req, res) => {
     }
 
     // Update booking and room
-    await db.run('UPDATE bookings SET status = "CheckedIn" WHERE id = ?', [req.params.id]);
-    await db.run('UPDATE rooms SET status = "Occupied" WHERE id = ?', [booking.room_id]);
+    await db.run("UPDATE bookings SET status = 'CheckedIn' WHERE id = ?", [req.params.id]);
+    await db.run("UPDATE rooms SET status = 'Occupied' WHERE id = ?", [booking.room_id]);
 
     // Record transaction
     const payMethod = payment_method || 'Credit Card';
@@ -315,8 +315,8 @@ router.post('/bookings/:id/check-out', async (req, res) => {
     }
 
     // Update booking and room
-    await db.run('UPDATE bookings SET status = "CheckedOut" WHERE id = ?', [req.params.id]);
-    await db.run('UPDATE rooms SET status = "Available" WHERE id = ?', [booking.room_id]);
+    await db.run("UPDATE bookings SET status = 'CheckedOut' WHERE id = ?", [req.params.id]);
+    await db.run("UPDATE rooms SET status = 'Available' WHERE id = ?", [booking.room_id]);
 
     res.json({ message: 'Checked out successfully' });
   } catch (err) {
@@ -332,11 +332,11 @@ router.post('/bookings/:id/cancel', async (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    await db.run('UPDATE bookings SET status = "Cancelled" WHERE id = ?', [req.params.id]);
+    await db.run("UPDATE bookings SET status = 'Cancelled' WHERE id = ?", [req.params.id]);
     
     // If the guest was checked in, make the room available
     if (booking.status === 'CheckedIn') {
-      await db.run('UPDATE rooms SET status = "Available" WHERE id = ?', [booking.room_id]);
+      await db.run("UPDATE rooms SET status = 'Available' WHERE id = ?", [booking.room_id]);
     }
 
     res.json({ message: 'Booking cancelled successfully' });
