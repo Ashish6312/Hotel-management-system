@@ -1,64 +1,61 @@
--- SQLite Database Schema for Hotel Management Dashboard
+-- PostgreSQL Database Schema for Hotel Management Dashboard
 
 -- Drop tables if they exist
-DROP TABLE IF EXISTS transactions;
-DROP TABLE IF EXISTS bookings;
-DROP TABLE IF EXISTS guests;
-DROP TABLE IF EXISTS rooms;
-DROP TABLE IF EXISTS staff;
+DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS guests CASCADE;
+DROP TABLE IF EXISTS rooms CASCADE;
+DROP TABLE IF EXISTS staff CASCADE;
 
 -- Rooms Table
 CREATE TABLE rooms (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    room_number TEXT UNIQUE NOT NULL,
-    type TEXT CHECK(type IN ('Single', 'Double', 'Suite', 'Deluxe')) NOT NULL,
-    status TEXT CHECK(status IN ('Available', 'Occupied', 'Maintenance')) DEFAULT 'Available',
-    price REAL NOT NULL,
+    id SERIAL PRIMARY KEY,
+    room_number VARCHAR(50) UNIQUE NOT NULL,
+    type VARCHAR(50) CHECK(type IN ('Single', 'Double', 'Suite', 'Deluxe')) NOT NULL,
+    status VARCHAR(50) CHECK(status IN ('Available', 'Occupied', 'Maintenance')) DEFAULT 'Available',
+    price DECIMAL(10, 2) NOT NULL,
     amenities TEXT -- Comma-separated list e.g., 'Free WiFi, AC, TV, Mini Bar'
 );
 
 -- Guests Table
 CREATE TABLE guests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    phone TEXT NOT NULL,
-    document_id TEXT NOT NULL
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(50) NOT NULL,
+    document_id VARCHAR(100) NOT NULL
 );
 
 -- Bookings Table
 CREATE TABLE bookings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    room_id INTEGER NOT NULL,
-    guest_id INTEGER NOT NULL,
-    check_in_date TEXT NOT NULL, -- Format: YYYY-MM-DD
-    check_out_date TEXT NOT NULL, -- Format: YYYY-MM-DD
-    status TEXT CHECK(status IN ('Booked', 'CheckedIn', 'CheckedOut', 'Cancelled')) DEFAULT 'Booked',
-    total_price REAL NOT NULL,
-    created_at TEXT DEFAULT (datetime('now', 'localtime')),
-    FOREIGN KEY(room_id) REFERENCES rooms(id) ON DELETE CASCADE,
-    FOREIGN KEY(guest_id) REFERENCES guests(id) ON DELETE CASCADE
+    id SERIAL PRIMARY KEY,
+    room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    guest_id INTEGER NOT NULL REFERENCES guests(id) ON DELETE CASCADE,
+    check_in_date VARCHAR(50) NOT NULL, -- Format: YYYY-MM-DD
+    check_out_date VARCHAR(50) NOT NULL, -- Format: YYYY-MM-DD
+    status VARCHAR(50) CHECK(status IN ('Booked', 'CheckedIn', 'CheckedOut', 'Cancelled')) DEFAULT 'Booked',
+    total_price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Staff Table
 CREATE TABLE staff (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    role TEXT CHECK(role IN ('Manager', 'Receptionist', 'Housekeeper', 'Security')) NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    phone TEXT NOT NULL,
-    status TEXT CHECK(status IN ('Active', 'Off-Duty')) DEFAULT 'Active'
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(50) CHECK(role IN ('Manager', 'Receptionist', 'Housekeeper', 'Security')) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(50) NOT NULL,
+    status VARCHAR(50) CHECK(status IN ('Active', 'Off-Duty')) DEFAULT 'Active'
 );
 
 -- Transactions Table (Revenue Tracking)
 CREATE TABLE transactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    booking_id INTEGER NOT NULL,
-    amount REAL NOT NULL,
-    payment_method TEXT CHECK(payment_method IN ('Credit Card', 'Cash', 'Bank Transfer', 'Digital Wallet')) NOT NULL,
-    payment_date TEXT DEFAULT (datetime('now', 'localtime')),
-    FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE
+    id SERIAL PRIMARY KEY,
+    booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50) CHECK(payment_method IN ('Credit Card', 'Cash', 'Bank Transfer', 'Digital Wallet')) NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes for performance

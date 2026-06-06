@@ -14,7 +14,7 @@ router.get('/dashboard/stats', async (req, res) => {
 
     // Revenue
     const today = new Date().toISOString().split('T')[0];
-    const todayRevenueRow = await db.get('SELECT SUM(amount) as total FROM transactions WHERE date(payment_date) = ?', [today]);
+    const todayRevenueRow = await db.get('SELECT SUM(amount) as total FROM transactions WHERE TO_CHAR(payment_date, \'YYYY-MM-DD\') = ?', [today]);
     const totalRevenueRow = await db.get('SELECT SUM(amount) as total FROM transactions');
 
     // Recent Bookings/Activity
@@ -51,10 +51,10 @@ router.get('/dashboard/revenue-analytics', async (req, res) => {
   try {
     // Get revenue grouped by day for the last 14 days
     const revenueHistory = await db.query(`
-      SELECT date(payment_date) as date, SUM(amount) as amount
+      SELECT TO_CHAR(payment_date, 'YYYY-MM-DD') as date, SUM(amount) as amount
       FROM transactions
-      GROUP BY date(payment_date)
-      ORDER BY date(payment_date) ASC
+      GROUP BY TO_CHAR(payment_date, 'YYYY-MM-DD')
+      ORDER BY TO_CHAR(payment_date, 'YYYY-MM-DD') ASC
       LIMIT 14
     `);
 
@@ -136,7 +136,7 @@ router.post('/guests', async (req, res) => {
     );
     res.status(201).json({ id: result.lastID, first_name, last_name, email, phone, document_id });
   } catch (err) {
-    if (err.message.includes('UNIQUE constraint failed: guests.email')) {
+    if (err.message.includes('UNIQUE constraint failed: guests.email') || err.message.includes('guests_email_key') || err.message.includes('duplicate key')) {
       return res.status(400).json({ error: 'A guest with this email already exists' });
     }
     res.status(500).json({ error: err.message });
@@ -333,7 +333,7 @@ router.post('/staff', async (req, res) => {
     );
     res.status(201).json({ id: result.lastID, name, role, email, phone, status: status || 'Active' });
   } catch (err) {
-    if (err.message.includes('UNIQUE constraint failed: staff.email')) {
+    if (err.message.includes('UNIQUE constraint failed: staff.email') || err.message.includes('staff_email_key') || err.message.includes('duplicate key')) {
       return res.status(400).json({ error: 'A staff member with this email already exists' });
     }
     res.status(500).json({ error: err.message });

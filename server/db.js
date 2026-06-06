@@ -1,54 +1,64 @@
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
+const dotenv = require('dotenv');
 
-const DB_PATH = path.resolve(__dirname, 'hotel.db');
+// Load environment variables in case they are not already loaded
+dotenv.config();
+
 const SCHEMA_PATH = path.resolve(__dirname, 'schema.sql');
 
-const db = new sqlite3.Database(DB_PATH, (err) => {
-  if (err) {
-    console.error('Error opening database', err.message);
-  } else {
-    console.log('Connected to the SQLite database.');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
   }
 });
 
-// Promise wrappers
-const query = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
+// Helper to convert SQLite "?" placeholders to PostgreSQL "$1", "$2", etc.
+function convertPlaceholders(sql) {
+  let count = 1;
+  return sql.replace(/\?/g, () => `$${count++}`);
+}
+
+// Promise wrappers for PG pool
+const query = async (sql, params = []) => {
+  const finalSql = convertPlaceholders(sql);
+  const res = await pool.query(finalSql, params);
+  return res.rows;
 };
 
-const get = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
+const get = async (sql, params = []) => {
+  const finalSql = convertPlaceholders(sql);
+  const res = await pool.query(finalSql, params);
+  return res.rows[0] || null;
 };
 
-const run = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) reject(err);
-      else resolve({ lastID: this.lastID, changes: this.changes });
-    });
-  });
+const run = async (sql, params = []) => {
+  let finalSql = convertPlaceholders(sql);
+  
+  // Detect if this is an INSERT statement
+  const isInsert = finalSql.trim().toLowerCase().startsWith('insert');
+  
+  // Append RETURNING id to get the auto-generated ID for inserts
+  if (isInsert && !finalSql.toLowerCase().includes('returning')) {
+    finalSql += ' RETURNING id';
+  }
+  
+  const res = await pool.query(finalSql, params);
+  
+  let lastID = null;
+  if (isInsert && res.rows.length > 0) {
+    // Return the id of the first returned row
+    lastID = res.rows[0].id;
+  }
+  
+  return { lastID, changes: res.rowCount };
 };
 
-// Batch/Serialize run
-const exec = (sql) => {
-  return new Promise((resolve, reject) => {
-    db.exec(sql, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+const exec = async (sql) => {
+  // Execute raw query block (supports multiple statements in pg)
+  await pool.query(sql);
 };
 
 // Seed initial data
@@ -112,8 +122,7 @@ async function seedData() {
     );
   }
 
-  // 4. Seed Bookings & Transactions (simulated history + some active/upcoming)
-  // Let's get today's date formatted as YYYY-MM-DD
+  // 4. Seed Bookings & Transactions
   const today = new Date();
   const formatDate = (d) => d.toISOString().split('T')[0];
 
@@ -123,7 +132,6 @@ async function seedData() {
   const dMinus2 = new Date(today); dMinus2.setDate(today.getDate() - 2);
   const dPlus2 = new Date(today); dPlus2.setDate(today.getDate() + 2);
   const dPlus5 = new Date(today); dPlus5.setDate(today.getDate() + 5);
-  const dPlus10 = new Date(today); dPlus10.setDate(today.getDate() + 10);
 
   // A. Past Completed Booking (Alice in 101, Checked Out)
   let res1 = await run(
@@ -151,7 +159,7 @@ async function seedData() {
     [6, 3, formatDate(dMinus2), formatDate(dPlus5), 'CheckedIn', 840.00]
   );
   // Mark room as Occupied
-  await run('UPDATE rooms SET status = "Occupied" WHERE id = 6');
+  await run('UPDATE rooms SET status = \'Occupied\' WHERE id = 6');
   // Record partial or full transaction
   await run(
     'INSERT INTO transactions (booking_id, amount, payment_method, payment_date) VALUES (?, ?, ?, ?)',
@@ -163,7 +171,7 @@ async function seedData() {
     'INSERT INTO bookings (room_id, guest_id, check_in_date, check_out_date, status, total_price) VALUES (?, ?, ?, ?, ?, ?)',
     [12, 5, formatDate(today), formatDate(dPlus5), 'CheckedIn', 1750.00]
   );
-  await run('UPDATE rooms SET status = "Occupied" WHERE id = 12');
+  await run('UPDATE rooms SET status = \'Occupied\' WHERE id = 12');
   await run(
     'INSERT INTO transactions (booking_id, amount, payment_method, payment_date) VALUES (?, ?, ?, ?)',
     [res4.lastID, 1750.00, 'Bank Transfer', formatDate(today)]
@@ -181,7 +189,7 @@ async function seedData() {
 async function initDb() {
   try {
     // Check if tables already exist
-    const tableExists = await get("SELECT name FROM sqlite_master WHERE type='table' AND name='rooms'");
+    const tableExists = await get("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='rooms'");
     
     if (!tableExists) {
       console.log('Database empty. Creating tables from schema...');
@@ -202,5 +210,5 @@ module.exports = {
   run,
   exec,
   initDb,
-  db
+  db: pool
 };
