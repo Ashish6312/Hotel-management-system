@@ -24,7 +24,10 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
 function App() {
   // Authentication State
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('grandview_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [loginEmail, setLoginEmail] = useState('sarah@grandview.com');
   const [loginPassword, setLoginPassword] = useState('password');
   const [loginError, setLoginError] = useState('');
@@ -103,6 +106,7 @@ function App() {
       if (!res.ok) throw new Error(data.error || 'Login failed');
 
       setUser(data);
+      localStorage.setItem('grandview_user', JSON.stringify(data));
 
       // Trigger login success confetti
       confetti({
@@ -118,6 +122,7 @@ function App() {
 
   const handleLogout = () => {
     setUser(null);
+    localStorage.removeItem('grandview_user');
     setActiveTab('dashboard');
   };
 
