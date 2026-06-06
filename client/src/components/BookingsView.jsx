@@ -173,7 +173,7 @@ export default function BookingsView({
 
                       {/* Price */}
                       <td className="p-4 font-bold text-hotel-gold">
-                        ${b.total_price.toFixed(2)}
+                        ${Number(b.total_price).toFixed(2)}
                       </td>
 
                       {/* Status badge */}

@@ -1,7 +1,11 @@
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
+
+// Set pg type parsers to return numeric fields as JS Numbers
+types.setTypeParser(1700, (val) => parseFloat(val)); // NUMERIC
+types.setTypeParser(20, (val) => parseInt(val, 10));  // INT8 / BIGINT
 
 // Load environment variables in case they are not already loaded
 dotenv.config();
