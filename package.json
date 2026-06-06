@@ -1,0 +1,10 @@
+{
+  "name": "hotel-management-dashboard",
+  "version": "1.0.0",
+  "description": "Root project directory to run Grandview Hotel Management Dashboard",
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "npx concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\""
+  }
+}
