@@ -89,16 +89,21 @@ function App() {
   }, [user]);
 
   // Auth Handler
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
 
-    if (loginEmail === 'sarah@grandview.com' && loginPassword === 'password') {
-      setUser({
-        name: 'Sarah Jenkins',
-        email: 'sarah@grandview.com',
-        role: 'Receptionist'
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword })
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+
+      setUser(data);
+
       // Trigger login success confetti
       confetti({
         particleCount: 80,
@@ -106,8 +111,8 @@ function App() {
         origin: { y: 0.8 },
         colors: ['#6366f1', '#d4af37', '#f59e0b']
       });
-    } else {
-      setLoginError('Invalid receptionist credentials. Try the prefilled credentials!');
+    } catch (err) {
+      setLoginError(err.message);
     }
   };
 
@@ -425,7 +430,7 @@ function App() {
         <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-accent-indigo/10 blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-hotel-gold/5 blur-[120px] pointer-events-none"></div>
 
-        <div className="w-full max-w-md bg-bg-dark border border-border-subtle rounded-2xl p-8 shadow-2xl relative z-10 space-y-6">
+         <div className="w-full max-w-md bg-bg-dark border border-border-subtle rounded-2xl p-8 shadow-2xl relative z-10 space-y-6">
           <div className="text-center space-y-2">
             <div className="inline-flex bg-gradient-to-tr from-hotel-gold to-yellow-300 p-3 rounded-2xl text-bg-darkest shadow-lg shadow-hotel-gold/15 mb-2">
               <Building2 size={26} className="stroke-[2.5]" />
@@ -434,6 +439,37 @@ function App() {
               Grandview Receptionist Portal
             </h1>
             <p className="text-xs text-slate-400">Log in to manage guest bookings and hotel transactions</p>
+          </div>
+
+          {/* Quick-Select Demo Personas */}
+          <div className="space-y-2.5">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide text-center">
+              Quick Sign-In (Demo Personas)
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { name: 'Sarah Jenkins', role: 'Receptionist', email: 'sarah@grandview.com' },
+                { name: 'Marcus Vance', role: 'Manager', email: 'marcus@grandview.com' },
+                { name: 'Thomas Miller', role: 'Housekeeper', email: 'thomas@grandview.com' }
+              ].map((profile) => (
+                <button
+                  key={profile.email}
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail(profile.email);
+                    setLoginPassword('password');
+                  }}
+                  className={`p-2 border rounded-xl flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
+                    loginEmail === profile.email
+                      ? 'border-hotel-gold bg-hotel-gold/10 text-hotel-gold'
+                      : 'border-border-subtle bg-bg-panel hover:border-slate-500 text-slate-300'
+                  }`}
+                >
+                  <span className="text-[11px] font-bold truncate w-full">{profile.name.split(' ')[0]}</span>
+                  <span className="text-[8px] text-slate-400 uppercase font-semibold mt-0.5">{profile.role}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {loginError && (
@@ -481,7 +517,7 @@ function App() {
 
           <div className="pt-4 border-t border-border-subtle/50 text-center">
             <p className="text-[10px] text-slate-500">
-              Prefilled credentials represent a simulated Receptionist user.
+              Any staff member email works with the password "password".
             </p>
           </div>
         </div>

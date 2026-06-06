@@ -2,6 +2,32 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db');
 
+// --- AUTHENTICATION ---
+
+// POST /api/auth/login
+router.post('/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  try {
+    const staffMember = await db.get('SELECT * FROM staff WHERE email = ?', [email.toLowerCase().trim()]);
+    if (!staffMember) {
+      return res.status(401).json({ error: 'Invalid email address. No staff profile found.' });
+    }
+    if (password !== 'password') {
+      return res.status(401).json({ error: 'Incorrect password. Try using "password".' });
+    }
+    res.json({
+      name: staffMember.name,
+      email: staffMember.email,
+      role: staffMember.role
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- DASHBOARD ANALYTICS ---
 
 // GET /api/dashboard/stats
