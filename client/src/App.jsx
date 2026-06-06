@@ -28,7 +28,7 @@ function App() {
     const savedUser = localStorage.getItem('grandview_user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const [loginEmail, setLoginEmail] = useState('sarah@grandview.com');
+  const [loginEmail, setLoginEmail] = useState('priya@grandview.co.in');
   const [loginPassword, setLoginPassword] = useState('password');
   const [loginError, setLoginError] = useState('');
 
@@ -446,34 +446,30 @@ function App() {
             <p className="text-xs text-slate-400">Log in to manage guest bookings and hotel transactions</p>
           </div>
 
-          {/* Quick-Select Demo Personas */}
-          <div className="space-y-2.5">
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide text-center">
-              Quick Sign-In (Demo Personas)
+          {/* Quick-Select Receptionist Profile */}
+          <div className="space-y-3">
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">
+              Active Receptionist Profile
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { name: 'Sarah Jenkins', role: 'Receptionist', email: 'sarah@grandview.com' },
-                { name: 'Marcus Vance', role: 'Manager', email: 'marcus@grandview.com' },
-                { name: 'Thomas Miller', role: 'Housekeeper', email: 'thomas@grandview.com' }
-              ].map((profile) => (
-                <button
-                  key={profile.email}
-                  type="button"
-                  onClick={() => {
-                    setLoginEmail(profile.email);
-                    setLoginPassword('password');
-                  }}
-                  className={`p-2 border rounded-xl flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
-                    loginEmail === profile.email
-                      ? 'border-hotel-gold bg-hotel-gold/10 text-hotel-gold'
-                      : 'border-border-subtle bg-bg-panel hover:border-slate-500 text-slate-300'
-                  }`}
-                >
-                  <span className="text-[11px] font-bold truncate w-full">{profile.name.split(' ')[0]}</span>
-                  <span className="text-[8px] text-slate-400 uppercase font-semibold mt-0.5">{profile.role}</span>
-                </button>
-              ))}
+            <div
+              onClick={() => {
+                setLoginEmail('priya@grandview.co.in');
+                setLoginPassword('password');
+              }}
+              className="glass-panel p-4 border border-border-subtle hover:border-hotel-gold/60 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 bg-bg-panel/40 hover:bg-bg-panel/60"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-hotel-gold to-amber-300 flex items-center justify-center text-bg-darkest font-extrabold text-sm shadow-md">
+                  PS
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Priya Sharma</h4>
+                  <p className="text-[10px] text-slate-400 mt-0.5">priya@grandview.co.in</p>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 bg-hotel-gold/10 border border-hotel-gold/20 text-hotel-gold text-[9px] font-extrabold rounded-md uppercase tracking-wider">
+                Receptionist
+              </span>
             </div>
           </div>
 

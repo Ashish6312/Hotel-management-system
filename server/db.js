@@ -69,17 +69,13 @@ const exec = async (sql) => {
 async function seedData() {
   console.log('Seeding initial data...');
   
-  // 1. Seed Staff
+  // 1. Seed Staff (Indian Names)
   const staff = [
-    ['Sarah Jenkins', 'Receptionist', 'sarah@grandview.com', '+1 (555) 019-2834', 'Active'],
-    ['Marcus Vance', 'Manager', 'marcus@grandview.com', '+1 (555) 019-5823', 'Active'],
-    ['Elena Rostova', 'Receptionist', 'elena@grandview.com', '+1 (555) 019-1122', 'Active'],
-    ['Thomas Miller', 'Housekeeper', 'thomas@grandview.com', '+1 (555) 019-9988', 'Active'],
-    ['Jessica Albright', 'Housekeeper', 'jessica@grandview.com', '+1 (555) 019-7744', 'Off-Duty'],
-    ['David Kross', 'Security', 'david.k@grandview.com', '+1 (555) 019-8833', 'Active'],
-    ['Samantha Reed', 'Manager', 'samantha.r@grandview.com', '+1 (555) 019-4400', 'Active'],
-    ['Amir Patel', 'Receptionist', 'amir.p@grandview.com', '+1 (555) 019-3355', 'Active'],
-    ['Linda Zhao', 'Housekeeper', 'linda.z@grandview.com', '+1 (555) 019-1244', 'Active']
+    ['Priya Sharma', 'Receptionist', 'priya@grandview.co.in', '+91 98765 43210', 'Active'],
+    ['Arjun Mehta', 'Manager', 'arjun@grandview.co.in', '+91 98234 56789', 'Active'],
+    ['Rajesh Kumar', 'Housekeeper', 'rajesh@grandview.co.in', '+91 97654 32109', 'Active'],
+    ['Karan Singh', 'Security', 'karan@grandview.co.in', '+91 96543 21098', 'Active'],
+    ['Sunita Rao', 'Housekeeper', 'sunita@grandview.co.in', '+91 95432 10987', 'Off-Duty']
   ];
   for (const member of staff) {
     await run(
@@ -88,32 +84,32 @@ async function seedData() {
     );
   }
 
-  // 2. Seed Rooms (20 total rooms: Single, Double, Deluxe, Suite)
+  // 2. Seed Rooms (20 total rooms: Single, Double, Deluxe, Suite - Prices in INR)
   const rooms = [
-    // 1st Floor - Single Rooms
-    ['101', 'Single', 'Available', 80.00, 'Free WiFi, AC, Smart TV, Shower'],
-    ['102', 'Single', 'Available', 80.00, 'Free WiFi, AC, Smart TV, Shower'],
-    ['103', 'Single', 'Maintenance', 80.00, 'Free WiFi, AC, Smart TV, Shower'],
-    ['104', 'Single', 'Available', 85.00, 'Free WiFi, AC, Smart TV, Balcony, Shower'],
-    ['105', 'Single', 'Available', 80.00, 'Free WiFi, AC, Smart TV, Shower'],
-    // 2nd Floor - Double Rooms
-    ['201', 'Double', 'Available', 120.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
-    ['202', 'Double', 'Available', 120.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
-    ['203', 'Double', 'Available', 125.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Balcony, Bath'],
-    ['204', 'Double', 'Available', 120.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
-    ['205', 'Double', 'Available', 120.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
-    // 3rd Floor - Deluxe Rooms
-    ['301', 'Deluxe', 'Available', 180.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
-    ['302', 'Deluxe', 'Available', 180.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
-    ['303', 'Deluxe', 'Available', 190.00, 'Free WiFi, AC, 4K TV, Mini Bar, Balcony, Bath, Room Service'],
-    ['304', 'Deluxe', 'Available', 180.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
-    ['305', 'Deluxe', 'Available', 180.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
-    // 4th Floor - Suites
-    ['401', 'Suite', 'Available', 350.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
-    ['402', 'Suite', 'Available', 350.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
-    ['403', 'Suite', 'Available', 360.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
-    ['404', 'Suite', 'Available', 350.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
-    ['405', 'Suite', 'Available', 380.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler']
+    // 1st Floor - Single Rooms (₹2,500)
+    ['101', 'Single', 'Available', 2500.00, 'Free WiFi, AC, Smart TV, Shower'],
+    ['102', 'Single', 'Available', 2500.00, 'Free WiFi, AC, Smart TV, Shower'],
+    ['103', 'Single', 'Maintenance', 2500.00, 'Free WiFi, AC, Smart TV, Shower'],
+    ['104', 'Single', 'Available', 2700.00, 'Free WiFi, AC, Smart TV, Balcony, Shower'],
+    ['105', 'Single', 'Available', 2500.00, 'Free WiFi, AC, Smart TV, Shower'],
+    // 2nd Floor - Double Rooms (₹4,500)
+    ['201', 'Double', 'Available', 4500.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
+    ['202', 'Double', 'Available', 4500.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
+    ['203', 'Double', 'Available', 4700.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Balcony, Bath'],
+    ['204', 'Double', 'Available', 4500.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
+    ['205', 'Double', 'Available', 4500.00, 'Free WiFi, AC, Smart TV, Mini Fridge, Bath'],
+    // 3rd Floor - Deluxe Rooms (₹7,500)
+    ['301', 'Deluxe', 'Available', 7500.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
+    ['302', 'Deluxe', 'Available', 7500.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
+    ['303', 'Deluxe', 'Available', 7800.00, 'Free WiFi, AC, 4K TV, Mini Bar, Balcony, Bath, Room Service'],
+    ['304', 'Deluxe', 'Available', 7500.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
+    ['305', 'Deluxe', 'Available', 7500.00, 'Free WiFi, AC, 4K TV, Mini Bar, Coffee Maker, Bath, Room Service'],
+    // 4th Floor - Suites (₹15,000)
+    ['401', 'Suite', 'Available', 15000.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
+    ['402', 'Suite', 'Available', 15000.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
+    ['403', 'Suite', 'Available', 16000.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
+    ['404', 'Suite', 'Available', 15000.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler'],
+    ['405', 'Suite', 'Available', 18000.00, 'Free WiFi, AC, 2x 4K TV, Mini Bar, Coffee Maker, Kitchenette, Jacuzzi, Balcony, Lounge Access, 24/7 Butler']
   ];
   for (const room of rooms) {
     await run(
@@ -122,23 +118,23 @@ async function seedData() {
     );
   }
 
-  // 3. Seed Guests (15 total guests)
+  // 3. Seed Guests (15 Indian Guests)
   const guests = [
-    ['Alice', 'Smith', 'alice.smith@gmail.com', '+1 (555) 123-4567', 'ID-99823'],
-    ['Bob', 'Johnson', 'bob.johnson@yahoo.com', '+1 (555) 234-5678', 'PP-88273'],
-    ['Charlie', 'Brown', 'charlie.brown@outlook.com', '+1 (555) 345-6789', 'DL-11223'],
-    ['David', 'Miller', 'david.miller@gmail.com', '+1 (555) 456-7890', 'ID-33445'],
-    ['Emma', 'Wilson', 'emma.wilson@hotmail.com', '+1 (555) 567-8901', 'PP-99001'],
-    ['Frank', 'Gomez', 'frank.gomez@gmail.com', '+1 (555) 678-9012', 'DL-44556'],
-    ['Grace', 'Kelly', 'grace.k@gmail.com', '+1 (555) 789-0123', 'ID-66778'],
-    ['Henry', 'Ford', 'henry.ford@ford.com', '+1 (555) 890-1234', 'PP-55443'],
-    ['Irene', 'Adler', 'irene.a@gmail.com', '+1 (555) 901-2345', 'DL-99887'],
-    ['Jack', 'Reacher', 'jack.r@army.mil', '+1 (555) 012-3456', 'ID-12345'],
-    ['Kate', 'Middleton', 'kate.m@royals.uk', '+1 (555) 123-9876', 'PP-88776'],
-    ['Leo', 'Tolstoy', 'leo.t@literature.ru', '+1 (555) 234-8765', 'DL-33221'],
-    ['Mary', 'Shelley', 'mary.s@gmail.com', '+1 (555) 345-7654', 'ID-55667'],
-    ['Nathan', 'Drake', 'nathan.d@uncharted.com', '+1 (555) 456-6543', 'PP-11229'],
-    ['Olivia', 'Wilde', 'olivia.w@gmail.com', '+1 (555) 567-5432', 'DL-88990']
+    ['Aarav', 'Patel', 'aarav.patel@gmail.com', '+91 98765 43210', 'Aadhar-8877'],
+    ['Dia', 'Sen', 'dia.sen@yahoo.co.in', '+91 98234 56789', 'PAN-3344'],
+    ['Kabir', 'Kapoor', 'kabir.k@outlook.com', '+91 97654 32109', 'Aadhar-1122'],
+    ['Ishaan', 'Nair', 'ishaan.nair@gmail.com', '+91 96543 21098', 'Passport-4455'],
+    ['Ananya', 'Iyer', 'ananya.iyer@gmail.com', '+91 95432 10987', 'Aadhar-9900'],
+    ['Rohan', 'Gupta', 'rohan.gupta@gmail.com', '+91 94321 09876', 'PAN-5566'],
+    ['Meera', 'Joshi', 'meera.j@gmail.com', '+91 93210 98765', 'Aadhar-6677'],
+    ['Vihaan', 'Sharma', 'vihaan.s@gmail.com', '+91 92109 87654', 'Passport-5544'],
+    ['Aditi', 'Rao', 'aditi.rao@gmail.com', '+91 91098 76543', 'PAN-9988'],
+    ['Dev', 'Verma', 'dev.verma@gmail.com', '+91 90987 65432', 'Aadhar-1234'],
+    ['Kiara', 'Advani', 'kiara.a@gmail.com', '+91 98987 65432', 'Passport-8877'],
+    ['Pranav', 'Reddy', 'pranav.r@gmail.com', '+91 97876 54321', 'Aadhar-3322'],
+    ['Riya', 'Chawla', 'riya.c@gmail.com', '+91 96765 43210', 'PAN-5566'],
+    ['Siddharth', 'Malhotra', 'sid.m@gmail.com', '+91 95654 32109', 'Passport-1122'],
+    ['Tara', 'Sutaria', 'tara.s@gmail.com', '+91 94543 21098', 'Aadhar-8899']
   ];
   for (const guest of guests) {
     await run(
@@ -148,20 +144,18 @@ async function seedData() {
   }
 
   // 4. Seed historical bookings & transactions (last 14 days)
-  // Generating daily transactions so that the line chart is fully populated
   const today = new Date();
   const formatDate = (d) => d.toISOString().split('T')[0];
 
   for (let i = 14; i >= 1; i--) {
     const checkIn = new Date(today);
-    checkIn.setDate(today.getDate() - i - 2); // Checked in i+2 days ago
+    checkIn.setDate(today.getDate() - i - 2);
     const checkOut = new Date(today);
-    checkOut.setDate(today.getDate() - i); // Checked out i days ago
+    checkOut.setDate(today.getDate() - i);
     
-    // Distribute rooms (1 to 8) and guests (1 to 8)
     const roomId = (i % 8) + 1;
     const guestId = (i % 8) + 1;
-    const price = (i % 2 === 0) ? 120.00 : 80.00;
+    const price = (i % 2 === 0) ? 4500.00 : 2500.00;
     const nights = 2;
     const totalPrice = price * nights;
     
@@ -180,11 +174,11 @@ async function seedData() {
   // 5. Seed active CheckedIn Bookings (rooms occupied right now)
   const activeBookings = [
     // roomId, guestId, checkInOffset, checkOutOffset, roomPrice
-    [10, 9, -2, 3, 120.00],  // Room 205 occupied by guest 9 since 2 days ago, checking out in 3 days
-    [11, 10, -1, 4, 180.00], // Room 301 occupied by guest 10 since 1 day ago, checking out in 4 days
-    [12, 11, 0, 5, 180.00],  // Room 302 occupied by guest 11 since today, checking out in 5 days
-    [16, 12, -3, 2, 350.00], // Room 401 occupied by guest 12 since 3 days ago, checking out in 2 days
-    [17, 13, -1, 2, 350.00]  // Room 402 occupied by guest 13 since 1 day ago, checking out in 2 days
+    [10, 9, -2, 3, 4500.00],  // Room 205 occupied by guest 9, checking out in 3 days
+    [11, 10, -1, 4, 7500.00], // Room 301 occupied by guest 10, checking out in 4 days
+    [12, 11, 0, 5, 7500.00],  // Room 302 occupied by guest 11, checking out in 5 days
+    [16, 12, -3, 2, 15000.00], // Room 401 occupied by guest 12, checking out in 2 days
+    [17, 13, -1, 2, 15000.00]  // Room 402 occupied by guest 13, checking out in 2 days
   ];
   
   for (const b of activeBookings) {
@@ -212,8 +206,8 @@ async function seedData() {
   // 6. Seed upcoming reservations (status: Booked)
   const upcomingBookings = [
     // roomId, guestId, checkInOffset, checkOutOffset, roomPrice
-    [13, 14, 2, 5, 190.00], // Room 303 booked for guest 14, check-in in 2 days, checking out in 5 days
-    [18, 15, 3, 7, 360.00]  // Room 403 booked for guest 15, check-in in 3 days, checking out in 7 days
+    [13, 14, 2, 5, 7800.00], // Room 303 booked for guest 14, check-in in 2 days
+    [18, 15, 3, 7, 16000.00]  // Room 403 booked for guest 15, check-in in 3 days
   ];
   for (const b of upcomingBookings) {
     const checkIn = new Date(today); checkIn.setDate(today.getDate() + b[2]);

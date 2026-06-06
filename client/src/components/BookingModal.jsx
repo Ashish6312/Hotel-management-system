@@ -144,7 +144,7 @@ export default function BookingModal({
                     if (isAvailable || isPreselected) {
                       return (
                         <option key={room.id} value={room.id}>
-                          Room {room.room_number} - {room.type} (${room.price}/night)
+                          Room {room.room_number} - {room.type} (₹{room.price}/night)
                         </option>
                       );
                     }
@@ -188,12 +188,12 @@ export default function BookingModal({
                 <div className="bg-bg-panel/30 border border-border-subtle/50 rounded-xl p-4 mt-2">
                   <h5 className="text-xs font-bold text-slate-400 mb-2 uppercase">Price Details</h5>
                   <div className="flex justify-between text-sm text-slate-300 mb-1.5">
-                    <span>${selectedRoom.price} × {nightsCount} nights</span>
-                    <span>${totalPrice.toFixed(2)}</span>
+                    <span>₹{selectedRoom.price} × {nightsCount} nights</span>
+                    <span>₹{totalPrice.toFixed(2)}</span>
                   </div>
                   <div className="border-t border-border-subtle/50 pt-2 mt-2 flex justify-between text-base font-bold text-hotel-gold">
                     <span>Total Amount</span>
-                    <span>${totalPrice.toFixed(2)}</span>
+                    <span>₹{totalPrice.toFixed(2)}</span>
                   </div>
                 </div>
               )}

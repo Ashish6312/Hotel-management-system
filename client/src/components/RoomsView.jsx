@@ -189,7 +189,7 @@ export default function RoomsView({
                   <div className="px-5 py-4 border-t border-border-subtle bg-bg-panel/30 flex justify-between items-center gap-4">
                     <div>
                       <span className="text-[10px] font-semibold text-slate-400 block uppercase">Price/Night</span>
-                      <span className="text-lg font-bold text-hotel-gold">${room.price}</span>
+                      <span className="text-lg font-bold text-hotel-gold">₹{room.price}</span>
                     </div>
 
                     <div className="flex gap-2">

@@ -38,9 +38,9 @@ export default function DashboardView({
 
   // Formatter for Currency
   const formatCurrency = (val) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       maximumFractionDigits: 0
     }).format(val);
   };
@@ -165,7 +165,7 @@ export default function DashboardView({
                   <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1b233d', borderColor: '#2d3859', borderRadius: '12px', color: '#fff' }}
-                    formatter={(val) => [`$${val}`, 'Revenue']}
+                    formatter={(val) => [`₹${val}`, 'Revenue']}
                   />
                   <Area type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
                 </AreaChart>
@@ -204,7 +204,7 @@ export default function DashboardView({
                   </Pie>
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1b233d', borderColor: '#2d3859', borderRadius: '8px', color: '#fff' }}
-                    formatter={(val) => [`$${val}`, 'Amount']}
+                    formatter={(val) => [`₹${val}`, 'Amount']}
                   />
                 </PieChart>
               </ResponsiveContainer>
